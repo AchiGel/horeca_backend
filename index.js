@@ -3,7 +3,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import "dotenv/config";
-import blog from "./models/blog.js";
+import Blog from "./models/blog.js";
 
 const app = express();
 const PORT = process.env.PORT;
@@ -15,61 +15,19 @@ const MONGO_URI = `mongodb+srv://${DB_USER}:${DB_PASSWORD}@horecadraft.av354.mon
 app.use(cors());
 app.use(bodyParser.json());
 
-mongoose
-  .connect(MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+async function start() {
+  try {
+    mongoose.connect(MONGO_URI);
 
-// const blogs = [
-//   {
-//     id: 1,
-//     title: "Test 1",
-//     description: "Descr for Test 1",
-//     content: "Content for Test 1",
-//     author: "author",
-//     publishedAt: "today",
-//     urlToImage: "https://via.placeholder.com/150",
-//   },
-//   {
-//     id: 2,
-//     title: "Test 2",
-//     description: "Descr for Test 2",
-//     content: "Content for Test 2",
-//     author: "author",
-//     publishedAt: "today",
-//     urlToImage: "https://via.placeholder.com/150",
-//   },
-//   {
-//     id: 3,
-//     title: "Test 3",
-//     description: "Descr for Test 3",
-//     content: "Content for Test 3",
-//     author: "author",
-//     publishedAt: "today",
-//     urlToImage: "https://via.placeholder.com/150",
-//   },
-//   {
-//     id: 4,
-//     title: "Test 4",
-//     description: "Descr for Test 4",
-//     content: "Content for Test 4",
-//     author: "author",
-//     publishedAt: "today",
-//     urlToImage: "https://via.placeholder.com/150",
-//   },
-//   {
-//     id: 5,
-//     title: "Test 5",
-//     description: "Descr for Test 5",
-//     content: "Content for Test 5",
-//     author: "author",
-//     publishedAt: "today",
-//     urlToImage: "https://via.placeholder.com/150",
-//   },
-// ];
+    app.listen(PORT, () => {
+      console.log(`Server started on port: ${PORT}`);
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+start();
 
 app.get("/", (req, res) => {
   res.send("Hello Horeca");
@@ -77,7 +35,7 @@ app.get("/", (req, res) => {
 
 app.get("/api/posts", async (req, res) => {
   try {
-    const blogs = await blog.find();
+    const blogs = await Blog.find();
     res.json(blogs);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch blogs" });
@@ -86,7 +44,7 @@ app.get("/api/posts", async (req, res) => {
 
 app.get("/api/posts/:id", async (req, res) => {
   try {
-    const blog = await blog.findById(req.params.id);
+    const blog = await Blog.findById(req.params.id);
     if (blog) {
       res.json(blog);
     } else {
@@ -107,7 +65,7 @@ app.post("/api/posts", async (req, res) => {
       .json({ error: "Title, content, and image are required" });
   }
   try {
-    const newBlog = new blog({
+    const newBlog = new Blog({
       title,
       content,
       description,
@@ -119,8 +77,4 @@ app.post("/api/posts", async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: "Failed to create blog" });
   }
-});
-
-app.listen(PORT, () => {
-  console.log(`Server started on port: ${PORT}`);
 });
