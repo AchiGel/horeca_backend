@@ -1,9 +1,13 @@
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
+import mongoose from "mongoose";
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT;
+const DB_USER = process.env.DB_USER;
+const DB_PASSWORD = process.env.DB_PASSWORD;
+const DB_NAME = process.env.DB_NAME;
 
 app.use(cors());
 app.use(bodyParser.json());
